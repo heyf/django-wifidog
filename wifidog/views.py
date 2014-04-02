@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse
 from .models import *
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from django.conf import settings
@@ -12,7 +12,7 @@ from .forms import LoginForm
 from .utilities import TokenMixin
 import logging
 
-
+logger = logging.getLogger(__name__)
 
 
 class BaseView(View):
@@ -73,6 +73,7 @@ class WIFIAuthView(TokenMixin, BaseView):
         else:
             auth_request.result = 0
             auth_request.save()
+            # logout(request)
             return HttpResponse('Auth: 0')
 
 
@@ -153,8 +154,11 @@ class WIFILoginView(TokenMixin, FormView):
 
     def authenticate(self, email, password):
 
-        if self.request.user.is_authenticated():
-            return True, self.request.user
+        # logger.debug('** start auth')
+
+        # if self.request.user.is_authenticated():
+        #    logger.debug('** authed user')
+        #    return True, self.request.user
 
         try:
             user = User.objects.get(email=email)
@@ -175,11 +179,21 @@ class WIFILoginView(TokenMixin, FormView):
         else:
             return False, user
 
+class WIFIPortalView(BaseView):
 
+     def get(self, request, *args, **kwargs):
 
+        return HttpResponse('this is portal')
 
+class WIFILogoutView(BaseView):
 
+    def get(self, request, *args, **kwargs):
+        logout(request)
 
+        if self.request.user.is_authenticated():
+            return HttpResponse('not logged out')
+
+        return HttpResponse('logged out')
 
 
 

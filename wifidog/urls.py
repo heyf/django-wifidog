@@ -20,7 +20,10 @@ urlpatterns = patterns('',
     url(r'^login/$', WIFILoginView.as_view(),
         name='wifi-login'),
 
-    url(r'^portal/$', lambda x: HttpResponseRedirect('/'),
+    url(r'^logout/$', WIFILogoutView.as_view(),
+        name='wifi-logout'),
+
+    url(r'^portal/$', WIFIPortalView.as_view(),
         name='wifi-portal'),
 
     url(r'^api/', include(v1_api.urls),
